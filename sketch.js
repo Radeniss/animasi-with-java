@@ -3,7 +3,7 @@ let startTime;
 let baseAngle = -27;
 let animationAngle = 0;  
 let baseHandAngle = 30;
-let baseKatanaAngle = -30;
+let baseKatanaAngle = 10;
 
 function preload () {
   hutan = loadImage ("hutan.jpg");
@@ -110,7 +110,6 @@ function draw () {
   const kickOffsetY = kickInitialY - kickPivotY + kickHeight/2;
   
  
-  
   // Gambar bagian bawah karakter utama
 
   image(kaki_2, 60, 140, 100, 200);
@@ -256,6 +255,14 @@ function draw () {
   const jubahoOffsetX = jubahoInitialX - jubahoPivotX + jubahoWidth/2;
   const jubahoOffsetY = jubahoInitialY - jubahoPivotY + jubahoHeight/2;
   
+  // Hitung offset katana berdasarkan posisi awal
+  const katanaInitialX = 530;
+  const katanaInitialY = 273;
+  const katanaWidth = 40;
+  const katanaHeight = 80;
+  const katanaOffsetX = katanaInitialX - katanaPivotX + katanaWidth/2;
+  const katanaOffsetY = katanaInitialY - katanaPivotY + katanaHeight/2;
+  
   // Hitung offset tangano berdasarkan posisi awal
   const handoInitialX = 500;
   const handoInitialY = 140;
@@ -264,13 +271,7 @@ function draw () {
   const handoOffsetX = handoInitialX - handoPivotX + handoWidth/2;
   const handoOffsetY = handoInitialY - handoPivotY + handoHeight/2;
   
-  // Hitung offset katana berdasarkan posisi awal
-  const katanaInitialX = 500;
-  const katanaInitialY = 140;
-  const katanaWidth = 50;
-  const katanaHeight = 100;
-  const katanaOffsetX = katanaInitialX - katanaPivotX + katanaWidth/2;
-  const katanaOffsetY = katanaInitialY - katanaPivotY + katanaHeight/2;
+
   
   
   // ANIMASI KEPALAO - rotasi dan pergeseran independen
@@ -329,6 +330,20 @@ function draw () {
   ellipse(0, 0, 8, 8);
   pop();
   
+  // ANIMASI KATANA - rotasi dan pergeseran independen
+  push();
+  translate(katanaPivotX, katanaPivotY);
+  rotate(radians(katanaRotationAngle));
+  translate(katanaDisplacementX, katanaDisplacementY);
+  imageMode(CENTER);
+  image(katana, katanaOffsetX, katanaOffsetY, katanaWidth, katanaHeight);
+  
+  // Debug: titik pivot (berwarna merah)
+  fill(255, 0, 0);
+  noStroke();
+  ellipse(0, 0, 8, 8);
+  pop();
+  
   // ANIMASI TANGANO - rotasi dan pergeseran independen
   push();
   translate(handoPivotX, handoPivotY);
@@ -343,19 +358,7 @@ function draw () {
   ellipse(0, 0, 8, 8);
   pop();
   
-  // ANIMASI KATANA - rotasi dan pergeseran independen
-  push();
-  translate(katanaPivotX, katanaPivotY);
-  rotate(radians(katanaRotationAngle));
-  translate(katanaDisplacementX, katanaDisplacementY);
-  imageMode(CENTER);
-  image(katana, katanaOffsetX, katanaOffsetY, katanaWidth, katanaHeight);
   
-  // Debug: titik pivot (berwarna merah)
-  fill(255, 0, 0);
-  noStroke();
-  ellipse(0, 0, 8, 8);
-  pop();
   
   
 
