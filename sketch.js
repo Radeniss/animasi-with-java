@@ -19,6 +19,7 @@ function preload () {
   
   tangano_1 = loadImage ("tangano-1.png");
   kakio_1 = loadImage ("kakio-1.png");
+  kakio_2 = loadImage ("kakio-2.png");
   kepalao_1 = loadImage ("kepalao-1.png");
   jubaho_1 = loadImage ("jubaho-1.png");
   o_samping = loadImage ("o_samping.png");
@@ -173,19 +174,131 @@ function draw () {
   pop();
   
   
+  // OBITO
+  
+  // PARAMETER KEPALAO INDEPENDEN
+  const headoRotationAngle = -9 * animProgress;
+  const headoDisplacementX = -20 * animProgress;
+  const headoDisplacementY = 1 * animProgress;
+  const headoPivotX = 550;
+  const headoPivotY = 220;
+  
+  // PARAMETER JUBAHO INDEPENDEN
+  const jubahoRotationAngle = -20 * animProgress;
+  const jubahoDisplacementX = -15 * animProgress;
+  const jubahoDisplacementY = -5 * animProgress;
+  const jubahoPivotX = 550;
+  const jubahoPivotY = 250;
+  
+  // PARAMETER TANGANO INDEPENDEN
+  const handoRotationAngle = 55 * animProgress;
+  const handoDisplacementX = -10 * animProgress;
+  const handoDisplacementY = 20 * animProgress;
+  const handoPivotX = 550;
+  const handoPivotY = 250;
+  
+  // PARAMETER KAKIO-2 INDEPENDEN
+  const kicko2RotationAngle = 55 * animProgress;
+  const kicko2DisplacementX = -10 * animProgress;
+  const kicko2DisplacementY = 20 * animProgress;
+  const kicko2PivotX = 550;
+  const kicko2PivotY = 250;
+  
+  // Hitung offset kepalao berdasarkan posisi awal
+  const headoInitialX = 500;
+  const headoInitialY = 140;
+  const headoWidth = 100;
+  const headoHeight = 200;
+  const headoOffsetX = headoInitialX - headoPivotX + headoWidth/2;
+  const headoOffsetY = headoInitialY - headoPivotY + headoHeight/2;
+  
+  // Hitung offset jubaho berdasarkan posisi awal
+  const jubahoInitialX = 500;
+  const jubahoInitialY = 140;
+  const jubahoWidth = 100;
+  const jubahoHeight = 200;
+  const jubahoOffsetX = jubahoInitialX - jubahoPivotX + jubahoWidth/2;
+  const jubahoOffsetY = jubahoInitialY - jubahoPivotY + jubahoHeight/2;
+  
+  // Hitung offset tangano berdasarkan posisi awal
+  const handoInitialX = 500;
+  const handoInitialY = 140;
+  const handoWidth = 100;
+  const handoHeight = 200;
+  const handoOffsetX = handoInitialX - handoPivotX + handoWidth/2;
+  const handoOffsetY = handoInitialY - handoPivotY + handoHeight/2;
+  
+  // Hitung offset kakio2 berdasarkan posisi awal
+  const kicko2InitialX = 500;
+  const kicko2InitialY = 140;
+  const kicko2Width = 100;
+  const kicko2Height = 200;
+  const kicko2OffsetX = kicko2InitialX - kicko2PivotX + kicko2Width/2;
+  const kicko2OffsetY = kicko2InitialY - kicko2PivotY + kicko2Height/2;
+  
+  
+  // ANIMASI KEPALAO - rotasi dan pergeseran independen
+  push();
+  translate(headoPivotX, headoPivotY);
+  rotate(radians(headoRotationAngle));
+  translate(headoDisplacementX, headoDisplacementY);
+  imageMode(CENTER);
+  image(kepalao_1, headoOffsetX, headoOffsetY, headoWidth, headoHeight);
+  
+  // Debug: titik pivot (berwarna merah)
+  fill(255, 0, 0);
+  noStroke();
+  ellipse(0, 0, 8, 8);
+  pop();
+  
+  // ANIMASI JUBAHO - rotasi dan pergeseran independen
+  push();
+  translate(jubahoPivotX, jubahoPivotY);
+  rotate(radians(jubahoRotationAngle));
+  translate(jubahoDisplacementX, jubahoDisplacementY);
+  imageMode(CENTER);
+  image(jubaho_1, jubahoOffsetX, jubahoOffsetY, jubahoWidth, jubahoHeight);
+  
+  // Debug: titik pivot (berwarna merah)
+  fill(255, 0, 0);
+  noStroke();
+  ellipse(0, 0, 8, 8);
+  pop();
+  
+  // ANIMASI TANGANO - rotasi dan pergeseran independen
+  push();
+  translate(handoPivotX, handoPivotY);
+  rotate(radians(handoRotationAngle));
+  translate(handoDisplacementX, handoDisplacementY);
+  imageMode(CENTER);
+  image(tangano_1, handoOffsetX, handoOffsetY, handoWidth, handoHeight);
+  
+  // Debug: titik pivot (berwarna merah)
+  fill(255, 0, 0);
+  noStroke();
+  ellipse(0, 0, 8, 8);
+  pop();
+  
+  // ANIMASI KAKIO2 - rotasi dan pergeseran independen
+  push();
+  translate(kicko2PivotX, kicko2PivotY);
+  rotate(radians(kicko2RotationAngle));
+  translate(kicko2DisplacementX, kicko2DisplacementY);
+  imageMode(CENTER);
+  image(kakio_2, kicko2OffsetX, kicko2OffsetY, kicko2Width, kicko2Height);
+  
+  // Debug: titik pivot (berwarna merah)
+  fill(255, 0, 0);
+  noStroke();
+  ellipse(0, 0, 8, 8);
+  pop();
+  
+  
   // Karakter lawan
-  image(o_samping, 500, 140, 100, 200);
   image(kakio_1, 500, 140, 100, 200);
-  image(kepalao_1, 500, 140, 100, 200);
-  image(jubaho_1, 500, 140, 100, 200);
-  image(tangano_1, 500, 140, 100, 200);
+  image(kakio_2, 500, 140, 100, 200);
+
   
   // Debug info
-  fill(0);
-  textSize(16);
-  text(`Waktu: ${elapsedSeconds.toFixed(1)} detik | Rotasi jubah: ${totalAngle.toFixed(1)}°`, 20, 30);
-  text(`Rotasi kepala: ${headRotationAngle.toFixed(1)}° | Rotasi tangan: ${handRotationAngle.toFixed(1)}° | Rotasi kakikiri: ${kickRotationAngle.toFixed(1)}°`, 20, 50);
-  text(`Pergeseran kepala: X:${headDisplacementX.toFixed(1)} Y:${headDisplacementY.toFixed(1)}`, 20, 70);
-  text(`Pergeseran tangan: X:${handDisplacementX.toFixed(1)} Y:${handDisplacementY.toFixed(1)}`, 20, 90);
-  
+  fill(0); 
 }
