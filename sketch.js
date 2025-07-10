@@ -3,6 +3,7 @@ let startTime;
 let baseAngle = -27;
 let animationAngle = 0;  
 let baseHandAngle = 30;
+let baseKatanaAngle = -30;
 
 function preload () {
   hutan = loadImage ("hutan.jpg");
@@ -23,6 +24,9 @@ function preload () {
   kepalao_1 = loadImage ("kepalao-1.png");
   jubaho_1 = loadImage ("jubaho-1.png");
   o_samping = loadImage ("o_samping.png");
+  
+  katana = loadImage ("katana.png");
+  kunai = loadImage ("kunai.png");
 }
 
 function setup () {
@@ -183,12 +187,34 @@ function draw () {
   const headoPivotX = 550;
   const headoPivotY = 220;
   
+  // PARAMETER KAKIO-1 INDEPENDEN
+  const kickoRotationAngle = -1 * animProgress;
+  const kickoDisplacementX = -5 * animProgress;
+  const kickoDisplacementY = -2 * animProgress;
+  const kickoPivotX = 550;
+  const kickoPivotY = 300;
+  
+  // PARAMETER KAKIO-2 INDEPENDEN
+  const kicko2RotationAngle = -30 * animProgress;
+  const kicko2DisplacementX = 15 * animProgress;
+  const kicko2DisplacementY = -1 * animProgress;
+  const kicko2PivotX = 550;
+  const kicko2PivotY = 300;
+  
   // PARAMETER JUBAHO INDEPENDEN
   const jubahoRotationAngle = -20 * animProgress;
   const jubahoDisplacementX = -15 * animProgress;
   const jubahoDisplacementY = -5 * animProgress;
   const jubahoPivotX = 550;
   const jubahoPivotY = 250;
+  
+  // PARAMETER KATANA INDEPENDEN
+  const katanaAnimationAngle = 55 * animProgress;
+  const katanaRotationAngle = baseKatanaAngle + katanaAnimationAngle;
+  const katanaDisplacementX = -10 * animProgress;
+  const katanaDisplacementY = 20 * animProgress;
+  const katanaPivotX = 550;
+  const katanaPivotY = 250;
   
   // PARAMETER TANGANO INDEPENDEN
   const handoRotationAngle = 55 * animProgress;
@@ -197,13 +223,6 @@ function draw () {
   const handoPivotX = 550;
   const handoPivotY = 250;
   
-  // PARAMETER KAKIO-2 INDEPENDEN
-  const kicko2RotationAngle = 55 * animProgress;
-  const kicko2DisplacementX = -10 * animProgress;
-  const kicko2DisplacementY = 20 * animProgress;
-  const kicko2PivotX = 550;
-  const kicko2PivotY = 250;
-  
   // Hitung offset kepalao berdasarkan posisi awal
   const headoInitialX = 500;
   const headoInitialY = 140;
@@ -211,6 +230,23 @@ function draw () {
   const headoHeight = 200;
   const headoOffsetX = headoInitialX - headoPivotX + headoWidth/2;
   const headoOffsetY = headoInitialY - headoPivotY + headoHeight/2;
+  
+  // Hitung offset kakio berdasarkan posisi awal
+  const kickoInitialX = 500;
+  const kickoInitialY = 140;
+  const kickoWidth = 100;
+  const kickoHeight = 200;
+  const kickoOffsetX = kickoInitialX - kickoPivotX + kickoWidth/2;
+  const kickoOffsetY = kickoInitialY - kickoPivotY + kickoHeight/2;
+  
+  // Hitung offset kakio2 berdasarkan posisi awal
+  const kicko2InitialX = 500;
+  const kicko2InitialY = 140;
+  const kicko2Width = 100;
+  const kicko2Height = 200;
+  const kicko2OffsetX = kicko2InitialX - kicko2PivotX + kicko2Width/2;
+  const kicko2OffsetY = kicko2InitialY - kicko2PivotY + kicko2Height/2;
+  
   
   // Hitung offset jubaho berdasarkan posisi awal
   const jubahoInitialX = 500;
@@ -228,13 +264,13 @@ function draw () {
   const handoOffsetX = handoInitialX - handoPivotX + handoWidth/2;
   const handoOffsetY = handoInitialY - handoPivotY + handoHeight/2;
   
-  // Hitung offset kakio2 berdasarkan posisi awal
-  const kicko2InitialX = 500;
-  const kicko2InitialY = 140;
-  const kicko2Width = 100;
-  const kicko2Height = 200;
-  const kicko2OffsetX = kicko2InitialX - kicko2PivotX + kicko2Width/2;
-  const kicko2OffsetY = kicko2InitialY - kicko2PivotY + kicko2Height/2;
+  // Hitung offset katana berdasarkan posisi awal
+  const katanaInitialX = 500;
+  const katanaInitialY = 140;
+  const katanaWidth = 50;
+  const katanaHeight = 100;
+  const katanaOffsetX = katanaInitialX - katanaPivotX + katanaWidth/2;
+  const katanaOffsetY = katanaInitialY - katanaPivotY + katanaHeight/2;
   
   
   // ANIMASI KEPALAO - rotasi dan pergeseran independen
@@ -244,6 +280,34 @@ function draw () {
   translate(headoDisplacementX, headoDisplacementY);
   imageMode(CENTER);
   image(kepalao_1, headoOffsetX, headoOffsetY, headoWidth, headoHeight);
+  
+  // Debug: titik pivot (berwarna merah)
+  fill(255, 0, 0);
+  noStroke();
+  ellipse(0, 0, 8, 8);
+  pop();
+  
+  // ANIMASI KAKIO - rotasi dan pergeseran independen
+  push();
+  translate(kickoPivotX, kickoPivotY);
+  rotate(radians(kickoRotationAngle));
+  translate(kickoDisplacementX, kickoDisplacementY);
+  imageMode(CENTER);
+  image(kakio_1, kickoOffsetX, kickoOffsetY, kickoWidth, kickoHeight);
+  
+  // Debug: titik pivot (berwarna merah)
+  fill(255, 0, 0);
+  noStroke();
+  ellipse(0, 0, 8, 8);
+  pop();
+  
+  // ANIMASI KAKIO2 - rotasi dan pergeseran independen
+  push();
+  translate(kicko2PivotX, kicko2PivotY);
+  rotate(radians(kicko2RotationAngle));
+  translate(kicko2DisplacementX, kicko2DisplacementY);
+  imageMode(CENTER);
+  image(kakio_2, kicko2OffsetX, kicko2OffsetY, kicko2Width, kicko2Height);
   
   // Debug: titik pivot (berwarna merah)
   fill(255, 0, 0);
@@ -279,13 +343,13 @@ function draw () {
   ellipse(0, 0, 8, 8);
   pop();
   
-  // ANIMASI KAKIO2 - rotasi dan pergeseran independen
+  // ANIMASI KATANA - rotasi dan pergeseran independen
   push();
-  translate(kicko2PivotX, kicko2PivotY);
-  rotate(radians(kicko2RotationAngle));
-  translate(kicko2DisplacementX, kicko2DisplacementY);
+  translate(katanaPivotX, katanaPivotY);
+  rotate(radians(katanaRotationAngle));
+  translate(katanaDisplacementX, katanaDisplacementY);
   imageMode(CENTER);
-  image(kakio_2, kicko2OffsetX, kicko2OffsetY, kicko2Width, kicko2Height);
+  image(katana, katanaOffsetX, katanaOffsetY, katanaWidth, katanaHeight);
   
   // Debug: titik pivot (berwarna merah)
   fill(255, 0, 0);
@@ -294,9 +358,6 @@ function draw () {
   pop();
   
   
-  // Karakter lawan
-  image(kakio_1, 500, 140, 100, 200);
-  image(kakio_2, 500, 140, 100, 200);
 
   
   // Debug info
