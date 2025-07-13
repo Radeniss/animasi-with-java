@@ -1,5 +1,6 @@
 // --- DEKLARASI VARIABEL GLOBAL ---
-let hutan, hutan2, n_samping, n_khusus, o_khusus, tangan_1, jubah_1, kepala_1, kaki_1, kunai_1, o_samping, jubaho_1, kepalao_1, kakio_1, tangano_1;
+let hutan, hutan2, tangan_1, jubah_1, kepala_1, kaki_1, kunai_1, tangano_1, kakio_1, kepalao_1, jubaho_1, n_khusus;
+let narutoa, obitoa, kunaia2;
 let startTime;
 let baseAngle = -27;
 let animationAngle = 0;
@@ -7,10 +8,9 @@ let baseHandAngle = 30;
 let baseKunaiAngle = -60;
 let baseKatanaAngle = 10;
 let specialSceneStartTime = -1;
-let v;
-let s;
+let v, s;
 let vStartTime = -1;
-let vPosition = { x: 0, y: 0 };
+let tahap2StartTime = -1;
 
 // Variabel untuk gambar adegan final
 let hutan3, nkunai, opedang;
@@ -20,7 +20,7 @@ let backgroundSnapshot;
 let snapshotTaken = false;
 
 
-// --- FUNGSI PRELOAD UNTUK MEMUAT ASET ---
+// --- FUNGSI PRELOAD ---
 function preload() {
     hutan = loadImage("hutan.jpg");
     hutan2 = loadImage("hutan2.jpg");
@@ -43,66 +43,164 @@ function preload() {
     katana = loadImage("katana.png");
     kunai = loadImage("kunai.png");
     v = loadImage("v.png");
-    s = loadImage("s.png"); 
+    s = loadImage("s.png");
 
-    // Muat gambar untuk adegan final
+    // Adegan final Tahap 1
     hutan3 = loadImage("hutan.jpg");
     nkunai = loadImage("nkunai.png");
     opedang = loadImage("opedang.png");
+    
+    // Adegan Tahap 2
+    narutoa = loadImage("narutoa.png");
+    obitoa = loadImage("obitoa.png");
+    kunaia2 = loadImage("kunaia2.png");
 }
 
-// --- FUNGSI SETUP UNTUK INISIALISASI ---
+// --- FUNGSI SETUP ---
 function setup() {
     createCanvas(640, 400);
     frameRate(30);
     startTime = millis();
-
-    // Siapkan kanvas untuk menyimpan snapshot
     backgroundSnapshot = createGraphics(width, height);
 }
 
-// --- FUNGSI DRAW UTAMA (LOGIKA FINAL) ---
+// --- FUNGSI DRAW UTAMA (STRUKTUR DIPERBAIKI) ---
 function draw() {
     const elapsedSeconds = (millis() - startTime) / 1000;
     const inSpecialScene = isInSpecialScene(elapsedSeconds);
 
-    // Urutan prioritas: Cek adegan final, lalu adegan khusus, lalu adegan normal
-    if (inSpecialScene) {
-         drawSpecialScene();
-      } else {
-            if (elapsedSeconds >= 16) {
-               drawFinalScene();
-               drawVAnimation(elapsedSeconds);
+    const fadeStartTime = 17.7;
+    const fadeDuration = 1.0;
+    const delayAfterFade = 1.0;
+    const tahap2TriggerTime = fadeStartTime + fadeDuration + delayAfterFade;
+
+    if (elapsedSeconds >= tahap2TriggerTime) {
+        // TAHAP 2: Setelah semua transisi selesai
+        if (tahap2StartTime < 0) {
+            tahap2StartTime = millis();
+        }
+        // Fade in objek-objek baru
+        const tahap2FadeInDuration = 1.0;
+        const tahap2Elapsed = (millis() - tahap2StartTime) / 1000;
+        let tahap2FadeProgress = constrain(tahap2Elapsed / tahap2FadeInDuration, 0, 1);
+        let tahap2Alpha = tahap2FadeProgress * 255;
+        
+        tint(255, tahap2Alpha);
+        drawTahap2();
+        noTint();
+
+    } else if (elapsedSeconds >= fadeStartTime) {
+       
+        drawFinalScene();
+        drawVAnimation(elapsedSeconds);
+        // Lalu timpa dengan efek gelap
+        let fadeProgress = (elapsedSeconds - fadeStartTime) / fadeDuration;
+        let alpha = constrain(fadeProgress, 0, 1) * 255;
+        fill(0, alpha);
+        noStroke();
+        rect(0, 0, width, height);
+
+    } else if (elapsedSeconds >= 16) {
+        drawFinalScene();
+        drawVAnimation(elapsedSeconds);
+
+    } else if (inSpecialScene) {
+        drawSpecialScene();
 
     } else {
-          if (elapsedSeconds >= 9 && !snapshotTaken) {
-                drawAnimatedBackground(1);
-                backgroundSnapshot.image(get(), 0, 0);
-                snapshotTaken = true;
-            }
-if (snapshotTaken) {
-                image(backgroundSnapshot, 0, 0);
-            } else {
-                let animProgress = constrain((elapsedSeconds - 8) / 1, 0, 1);
-                drawAnimatedBackground(animProgress);
-            }
+        if (elapsedSeconds >= 9 && !snapshotTaken) {
+            drawAnimatedBackground(1);
+            backgroundSnapshot.image(get(), 0, 0);
+            snapshotTaken = true;
+        }
+        if (snapshotTaken) {
+            image(backgroundSnapshot, 0, 0);
+        } else {
+            let animProgress = constrain((elapsedSeconds - 8) / 1, 0, 1);
+            drawAnimatedBackground(animProgress);
         }
     }
 
-    // Tampilkan informasi waktu
+    // Teks Waktu (selalu di atas)
     fill(0);
     textSize(16);
     text(`Waktu: ${elapsedSeconds.toFixed(1)} detik`, 20, 30);
 }
 
 
-// --- FUNGSI UNTUK MENGGAMBAR ANIMASI AWAL ---
+// --- FUNGSI GAMBAR TAHAP 2 ---
+function drawTahap2() {
+    image(hutan, 0, 0, width, height);
+    image(narutoa, 50, 100, 150, 300);
+    image(obitoa, 400, 120, 180, 310);
+    image(kunaia2, 250, 150, 50, 100);
+}
+
+
+// --- FUNGSI GAMBAR V & S (DIPERBAIKI) ---
+function drawVAnimation(elapsedSeconds) {
+    if (elapsedSeconds >= 16 && vStartTime < 0) {
+        vStartTime = millis();
+    }
+    push();
+    if (vStartTime > 0) {
+        const vElapsed = (millis() - vStartTime) / 1000;
+        const vDuration = 0.7;
+        const progress = min(vElapsed / vDuration, 1);
+        
+        const offset = 60; // Jarak 1.5 cm dari tengah
+
+        let vPosX = width / 2 - offset;
+        let vPosY = -100 + progress * 300;
+
+        let sPosX = width / 2 + offset;
+        let sPosY = height + 100 - progress * 300;
+
+        const alpha = progress * 255;
+        tint(255, alpha);
+        imageMode(CENTER);
+
+        image(v, vPosX, vPosY, 100, 100);
+        image(s, sPosX, sPosY, 100, 100);
+
+        noTint();
+    }
+    pop();
+}
+
+// --- FUNGSI-FUNGSI LAIN (Tidak ada perubahan) ---
+function drawFinalScene() {
+    image(hutan3, 0, 0, width, height);
+    image(nkunai, 50, 120, 150, 300);
+    image(opedang, 390, 130, 180, 310);
+}
+function isInSpecialScene(elapsedSeconds) {
+    if (elapsedSeconds >= 11 && specialSceneStartTime < 0) {
+        specialSceneStartTime = millis();
+    }
+    if (specialSceneStartTime > 0) {
+        const specialSceneElapsed = (millis() - specialSceneStartTime) / 1000;
+        return specialSceneElapsed < 5;
+    }
+    return false;
+}
+function drawSpecialScene() {
+    background(200);
+    image(hutan2, 0, 0, width, height);
+    const narutoX = 155;
+    const narutoY = 88;
+    image(n_khusus, narutoX, narutoY, 260, 520);
+    fill(255, 0, 0);
+    textSize(24);
+    textAlign(CENTER);
+    text("PERTARUNGAN EPIC!", width / 2, 50);
+    textSize(16);
+    text(`Adegan khusus: ${(5 - (millis() - specialSceneStartTime) / 1000).toFixed(1)} detik lagi`, width / 2, 80);
+}
 function drawAnimatedBackground(animProgress) {
     image(hutan, 0, 0, width, height);
     animationAngle = animProgress * 15;
     const totalAngle = baseAngle + animationAngle;
-
-    // --- NARUTO ---
     const displacementMagnitude = animProgress * 20;
     const radiansAngle = radians(totalAngle);
     const displacementX = cos(radiansAngle) * displacementMagnitude;
@@ -112,34 +210,29 @@ function drawAnimatedBackground(animProgress) {
     const headDisplacementY = 9 * animProgress;
     const headPivotX = 90;
     const headPivotY = 200;
-  
     const kunaiAnimationAngle = -45 * animProgress;
     const totalKunaiRotation = baseKunaiAngle + kunaiAnimationAngle;
     const kunaiDisplacementX = -10 * animProgress;
     const kunaiDisplacementY = -2 * animProgress;
     const kunaiPivotX = 95;
     const kunaiPivotY = 275;
-  
     const handAnimationAngle = -45 * animProgress;
     const totalHandRotation = baseHandAngle + handAnimationAngle;
     const handDisplacementX = -5 * animProgress;
     const handDisplacementY = 10 * animProgress;
     const handPivotX = 95;
     const handPivotY = 275;
-  
     const kickRotationAngle = 45 * animProgress;
     const kickDisplacementX = -5 * animProgress;
     const kickDisplacementY = -4 * animProgress;
     const kickPivotX = 95;
     const kickPivotY = 290;
-  
     const headInitialX = 36;
     const headInitialY = 136;
     const headWidth = 100;
     const headHeight = 200;
     const headOffsetX = headInitialX - headPivotX + headWidth / 2;
     const headOffsetY = headInitialY - headPivotY + headHeight / 2;
-  
     const kunaiInitialX = 50;
     const kunaiInitialY = 288;
     const kunaiWidth = 35;
@@ -196,8 +289,6 @@ function drawAnimatedBackground(animProgress) {
     imageMode(CENTER);
     image(tangan_1, handOffsetX, handOffsetY, handWidth, handHeight);
     pop();
-
-    // --- OBITO ---
     const headoRotationAngle = -9 * animProgress;
     const headoDisplacementX = -20 * animProgress;
     const headoDisplacementY = 1 * animProgress;
@@ -307,71 +398,4 @@ function drawAnimatedBackground(animProgress) {
     imageMode(CENTER);
     image(tangano_1, handoOffsetX, handoOffsetY, handoWidth, handoHeight);
     pop();
-}
-
-// --- FUNGSI UNTUK ANIMASI "V" ---
-function drawVAnimation(elapsedSeconds) {
-    if (elapsedSeconds >= 16 && vStartTime < 0) {
-        vStartTime = millis();
-    }
-   push();
-    if (vStartTime > 0) {
-        const vElapsed = (millis() - vStartTime) / 1000;
-        const vDuration = 0.7;
-        const progress = min(vElapsed / vDuration, 1);
-        const offset = 5;
-        const finalY = 15;
-      
-        let vPosX = width / 2 - offset;
-        let vPosY = -100 + progress * 300;
-      
-        let sPosX = width / 2 + offset;
-        let sPosY = height + 100 - progress * 300;
-      
-        const alpha = progress * 255;
-        tint(255, alpha);
-        imageMode(CENTER);
-
-        image(v, vPosX, vPosY, 100, 100);
-        image(s, sPosX, sPosY, 100, 100);
-
-        noTint();
-    }
-    pop();
-}
-
-// --- FUNGSI UNTUK ADEGAN FINAL ---
-function drawFinalScene() {
-    image(hutan3, 0, 0, width, height);
-    // Angka posisi X dan Y bisa Anda ubah sesuai keinginan
-    image(nkunai, 50, 120, 150, 300);
-    image(opedang, 390, 130, 180, 310);
-}
-
-// --- FUNGSI-FUNGSI LAIN (TIDAK BERUBAH) ---
-function isInSpecialScene(elapsedSeconds) {
-    if (elapsedSeconds >= 11 && specialSceneStartTime < 0) {
-        specialSceneStartTime = millis();
-    }
-    if (specialSceneStartTime > 0) {
-        const specialSceneElapsed = (millis() - specialSceneStartTime) / 1000;
-        return specialSceneElapsed < 5;
-    }
-    return false;
-}
-
-function drawSpecialScene() {
-    background(200);
-    image(hutan2, 0, 0, width, height);
-
-    const narutoX = 155;
-    const narutoY = 88;
-    image(n_khusus, narutoX, narutoY, 260, 520);
-
-    fill(255, 0, 0);
-    textSize(24);
-    textAlign(CENTER);
-    text("PERTARUNGAN EPIC!", width / 2, 50);
-    textSize(16);
-    text(`Adegan khusus: ${(5 - (millis() - specialSceneStartTime) / 1000).toFixed(1)} detik lagi`, width / 2, 80);
 }
