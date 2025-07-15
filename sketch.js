@@ -13,20 +13,19 @@ let vStartTime = -1;
 let tahap2StartTime = -1;
 let narutoa2, tanga_na2, rasengan;
 let tahap3StartTime = -1;
-let kyubi, narutoback;
-
-// Variabel untuk gambar adegan final
+let kyubi;
+let tahap4Started = false;
 let hutan3, nkunai, opedang;
-
-// Variabel untuk snapshot background
 let backgroundSnapshot;
 let snapshotTaken = false;
+let narutosound;
 
 
 // --- FUNGSI PRELOAD ---
 function preload() {
     hutan = loadImage("hutan.jpg");
     hutan2 = loadImage("hutan2.jpg");
+    narutosound = loadSound('narutosound.mp3');
 
     n_khusus = loadImage("n_khusus.png");
     tangan_1 = loadImage("tangan-1.png");
@@ -60,8 +59,12 @@ function preload() {
     
     // Adegan Tahap 3
     narutoa2 = loadImage("narutoa2.png");
-    tanga_na2 = loadImage("tangana2.png"); // Pastikan nama file ini benar
+    tanga_na2 = loadImage("tangana2.png");
     rasengan = loadImage("rasengan.png");
+  
+    // Adegan Tahap 4
+    narutoback = loadImage("narutoback.png");
+    kyubi = createVideo("end.mp4");
 }
 
 // --- FUNGSI SETUP ---
@@ -70,71 +73,62 @@ function setup() {
     frameRate(30);
     startTime = millis();
     backgroundSnapshot = createGraphics(width, height);
+    kyubi.hide();
+    narutosound.loop();
 }
 
 // --- FUNGSI DRAW UTAMA ---
-// --- FUNGSI DRAW UTAMA (DENGAN FADE OUT TERAKHIR) ---
 function draw() {
     const elapsedSeconds = (millis() - startTime) / 1000;
-    
-    // --- Pengaturan Waktu untuk Semua Adegan ---
     const inSpecialScene = isInSpecialScene(elapsedSeconds);
 
     const tahap1_fadeStartTime = 17.7;
     const tahap1_fadeDuration = 1.0;
     const tahap1_delayAfterFade = 1.0;
-    const tahap2_TriggerTime = tahap1_fadeStartTime + tahap1_fadeDuration + tahap1_delayAfterFade; // Mulai di 19.7s
+    const tahap2_TriggerTime = tahap1_fadeStartTime + tahap1_fadeDuration + tahap1_delayAfterFade;
 
-    // Menggunakan durasi 5 detik dari kode Anda sebelumnya
-    const tahap2_moveDuration = 5.0; 
-    const tahap2_endTime = tahap2_TriggerTime + tahap2_moveDuration; // Selesai di 24.7s
-    const tahap2_fadeStartTime = tahap2_endTime + 1.0; // Mulai di 25.7s
+    const tahap2_moveDuration = 5.0;
+    const tahap2_endTime = tahap2_TriggerTime + tahap2_moveDuration;
+    const tahap2_fadeStartTime = tahap2_endTime;
     const tahap2_fadeDuration = 1.0;
-    const tahap2_delayAfterFade = 1.0;
-    const tahap3_TriggerTime = tahap2_fadeStartTime + tahap2_fadeDuration + tahap2_delayAfterFade; // Mulai di 27.7s
-
-    // Waktu untuk animasi akhir di Tahap 3
+    const tahap2_delayAfterFade = 0;
+    const tahap3_TriggerTime = tahap2_fadeStartTime + tahap2_fadeDuration + tahap2_delayAfterFade;
+    
     const tahap3_initialAnimDuration = 1.0;
     const tahap3_finalAnimDuration = 0.5;
-    const tahap3_totalAnimDuration = tahap3_initialAnimDuration + tahap3_finalAnimDuration; // Total 1.5s
-    const tahap3_animEndTime = tahap3_TriggerTime + tahap3_totalAnimDuration; // Selesai di 29.2s
+    const tahap3_totalAnimDuration = tahap3_initialAnimDuration + tahap3_finalAnimDuration;
+    const tahap3_animEndTime = tahap3_TriggerTime + tahap3_totalAnimDuration;
     
-    // Waktu untuk fade out penutup
-    const finalFadeStartTime = tahap3_animEndTime; // Mulai di 29.2s
-    const finalFadeDuration = 1.5; // Durasi fade 1.5 detik
+    // --- PERUBAHAN & PENAMBAHAN DI SINI ---
+    const finalFadeStartTime = tahap3_animEndTime; 
+    const finalFadeDuration = 1.5;
+    const tahap4_TriggerTime = finalFadeStartTime + finalFadeDuration;
 
-
-    // --- Logika Pengaturan Adegan (dari akhir ke awal) ---
-    if (elapsedSeconds >= finalFadeStartTime) {
-        // TAHAP AKHIR: FADE OUT PENUTUP
-        // Gambar dulu frame terakhir dari Tahap 3 agar tidak hitam tiba-tiba
+    if (elapsedSeconds >= tahap4_TriggerTime) {
+      
+        // TAHAP 4
+        drawTahap4();
+    } else if (elapsedSeconds >= finalFadeStartTime) {
         drawTahap3(tahap3_totalAnimDuration);
-        
-        // Lalu timpa dengan efek gelap
         let fadeProgress = (elapsedSeconds - finalFadeStartTime) / finalFadeDuration;
         let alpha = constrain(fadeProgress, 0, 1) * 255;
         fill(0, alpha);
         noStroke();
         rect(0, 0, width, height);
-
+      
     } else if (elapsedSeconds >= tahap3_TriggerTime) {
-        // TAHAP 3: Adegan Final dengan semua animasinya
         if (tahap3StartTime < 0) {
             tahap3StartTime = millis();
         }
         const tahap3Elapsed = (millis() - tahap3StartTime) / 1000;
-        
-        // Efek fade-in awal untuk seluruh adegan Tahap 3
         const initialFadeInDuration = 1.0;
         let initialFadeProgress = constrain(tahap3Elapsed / initialFadeInDuration, 0, 1);
-        
         tint(255, initialFadeProgress * 255);
         drawTahap3(tahap3Elapsed);
         noTint();
 
     } else if (elapsedSeconds >= tahap2_fadeStartTime) {
-        // Transisi Gelap dari Tahap 2 ke 3
-        drawTahap2(tahap2_moveDuration); // Tampilkan frame terakhir Tahap 2
+        drawTahap2(tahap2_moveDuration);
         let fadeProgress = (elapsedSeconds - tahap2_fadeStartTime) / tahap2_fadeDuration;
         let alpha = constrain(fadeProgress, 0, 1) * 255;
         fill(0, alpha);
@@ -162,7 +156,6 @@ function draw() {
         rect(0, 0, width, height);
 
     } else if (elapsedSeconds >= 16) {
-        // Adegan V & S sebelum transisi
         drawFinalScene();
         drawVAnimation(elapsedSeconds);
 
@@ -184,22 +177,17 @@ function draw() {
             drawAnimatedBackground(animProgress);
         }
     }
-
-    // Teks Waktu (selalu di atas)
-    fill(0);
-    textSize(16);
-    text(`Waktu: ${elapsedSeconds.toFixed(1)} detik`, 20, 30);
 }
-
 
 // --- FUNGSI GAMBAR TAHAP 2 ---
 function drawTahap2(tahap2Elapsed) {
     image(hutan, 0, 0, width, height);
-    const moveDuration = 2.0;
+    const moveDuration = 5.0;
+    // -------------------------
     let moveProgress = constrain(tahap2Elapsed / moveDuration, 0, 1);
     
     let narutoa_startX = 30;
-    let narutoa_endX = 30 + 50; 
+    let narutoa_endX = 30 + 50;  
     let kunaia2_startX = 250;
     let kunaia2_endX = 250 + 200;
     let obitoa_startX = 350;
@@ -216,11 +204,10 @@ function drawTahap2(tahap2Elapsed) {
 
 // --- FUNGSI GAMBAR TAHAP 3 (DENGAN ANIMASI AKHIR) ---
 function drawTahap3(tahap3Elapsed) {
-    // Gambar latar dan naruto yang diam
     image(hutan, 0, 0, width, height);
     image(narutoa2, 290, 20, 200, 250);
 
-    // --- Animasi Awal Tahap 3 (berlangsung 1 detik) ---
+    // --- Animasi Awal Tahap 3
     const initialAnimDuration = 1.0;
     let initialProgress = constrain(tahap3Elapsed / initialAnimDuration, 0, 1);
 
@@ -230,7 +217,6 @@ function drawTahap3(tahap3Elapsed) {
     let obitoaInitialY = 140; 
     let tanganAngle = lerp(0, -50, initialProgress);
 
-    // --- Animasi Akhir "Ledakan" (mulai setelah animasi awal selesai) ---
     const finalAnimDuration = 0.5;
     const finalAnimStartTime = initialAnimDuration;
     let finalAnimProgress = 0;
@@ -269,6 +255,15 @@ function drawTahap3(tahap3Elapsed) {
     pop();
 }
 
+// --- FUNGSI GAMBAR TAHAP 4 ---
+function drawTahap4() {
+    if (!tahap4Started) {
+        kyubi.loop();
+      tahap4Started = true;
+    }
+    image(kyubi, 0, 0, width, height);
+}
+
 // --- FUNGSI-FUNGSI LAIN ---
 function drawVAnimation(elapsedSeconds) {
     if (elapsedSeconds >= 16 && vStartTime < 0) {
@@ -279,7 +274,7 @@ function drawVAnimation(elapsedSeconds) {
         const vElapsed = (millis() - vStartTime) / 1000;
         const vDuration = 0.7;
         const progress = min(vElapsed / vDuration, 1);
-        const offset = 60;
+        const offset = 5;
         let vPosX = width / 2 - offset;
         let vPosY = -100 + progress * 300;
         let sPosX = width / 2 + offset;
@@ -315,11 +310,6 @@ function drawSpecialScene() {
     const narutoY = 88;
     image(n_khusus, narutoX, narutoY, 260, 520);
     fill(255, 0, 0);
-    textSize(24);
-    textAlign(CENTER);
-    text("PERTARUNGAN EPIC!", width / 2, 50);
-    textSize(16);
-    text(`Adegan khusus: ${(5 - (millis() - specialSceneStartTime) / 1000).toFixed(1)} detik lagi`, width / 2, 80);
 }
 function drawAnimatedBackground(animProgress) {
     image(hutan, 0, 0, width, height);
